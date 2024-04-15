@@ -3,12 +3,13 @@ package org.example
 class MessageInfoMetrics(
     private var loadConfig: LoadConfig,
 
-
-
 ) {
-    private var messageCount : Int = 0
+    private var messageCount = 0
+    private var theoreticalMessageCount = 0
 
-
+    init {
+        theoreticalMessageCount = loadConfig.amountOfGroups * loadConfig.channelsPerThread * loadConfig.nMessagesPerChannel
+    }
     @Synchronized
     fun increment(){
         messageCount++
@@ -18,17 +19,22 @@ class MessageInfoMetrics(
         return messageCount
     }
 
+    fun getTheoreticalMessageCount(): Int{
+        return theoreticalMessageCount
+    }
 
-    fun printParameters(){
-        val theoreticalValue = loadConfig.amountOfGroups * loadConfig.channelsPerThread * loadConfig.nMessagesPerChannel
-        println("Load parameters :")
-        println("group(s) : ${loadConfig.amountOfGroups} ")
-        println("thread(s) : ${loadConfig.eventLoopsPerGroup} ")
-        println("channel(s)/thread : ${loadConfig.channelsPerThread}")
-        println("messages/channel : ${loadConfig.nMessagesPerChannel} ")
-        println("Keep alive : ${loadConfig.keepAliveSec}")
-        println("qos : ${loadConfig.qos}")
-        println("payload size : ${loadConfig.messagePayloadSize}")
-        println("${theoreticalValue}")
+    fun loadParameters(): String{
+
+        return buildString {
+            appendLine("Load parameters :")
+            appendLine("group(s) : ${loadConfig.amountOfGroups} ")
+            appendLine("thread(s) : ${loadConfig.eventLoopsPerGroup} ")
+            appendLine("channel(s)/thread : ${loadConfig.channelsPerThread}")
+            appendLine("messages/channel : ${loadConfig.nMessagesPerChannel} ")
+            appendLine("Keep alive : ${loadConfig.keepAliveSec}")
+            appendLine("qos : ${loadConfig.qos}")
+            appendLine("payload size : ${loadConfig.messagePayloadSize}")
+            appendLine("theoretical value : ${theoreticalMessageCount}")
+        }
     }
 }

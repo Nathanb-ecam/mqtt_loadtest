@@ -4,7 +4,9 @@ import io.netty.bootstrap.Bootstrap
 import io.netty.channel.nio.NioEventLoopGroup
 import io.netty.channel.socket.nio.NioSocketChannel
 import io.netty.handler.codec.mqtt.MqttQoS
+import org.eclipse.paho.client.mqttv3.MqttClient
 import org.example.mqtt.MqttClientInitializer
+import org.example.org.example.MqttCredentials
 import java.net.InetSocketAddress
 import java.util.concurrent.Executors
 
@@ -12,11 +14,13 @@ class LoadTester(
     private val broker : String,
     private val port : Int,
     private val topic : String,
+    private val mqttCredentials : MqttCredentials,
     private val loadConfig: LoadConfig
 ){
 
 
     fun launch(useMetrics : Boolean = false){
+
 
         val startTime = System.currentTimeMillis()
         val executor = Executors.newFixedThreadPool(loadConfig.amountOfGroups)
@@ -33,7 +37,7 @@ class LoadTester(
                         val bootstrap = Bootstrap()
                         bootstrap.group(eventLoopGroup)
                             .channel(NioSocketChannel::class.java)
-                            .handler(MqttClientInitializer(groupId,topic, loadConfig,infoMetrics))
+                            .handler(MqttClientInitializer(groupId,topic, loadConfig,mqttCredentials,infoMetrics))
                         for(i in 1..loadConfig.channelsPerThread){
                             /*println("channel ${i}")*/
                             val future = bootstrap.connect(InetSocketAddress(broker, port)).sync()

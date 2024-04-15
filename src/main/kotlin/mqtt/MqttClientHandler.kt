@@ -6,12 +6,14 @@ import io.netty.channel.ChannelInboundHandlerAdapter
 import io.netty.handler.codec.mqtt.*
 import org.example.LoadConfig
 import org.example.MessageInfoMetrics
+import org.example.org.example.MqttCredentials
 
 class MqttClientHandler(
     private val groupId : Int,
     private val channelId : Int,
     private val topic: String,
     private val loadConfig: LoadConfig,
+    private val mqttCredentials: MqttCredentials,
     private val messageCounter : MessageInfoMetrics?
 ) : ChannelInboundHandlerAdapter() {
 
@@ -23,7 +25,7 @@ class MqttClientHandler(
         connectMessage = MqttMessageFactory.newMessage(
             MqttFixedHeader(MqttMessageType.CONNECT, false, loadConfig.qos, false, 0),
             MqttConnectVariableHeader("MQTT", 4, true, true, false, 0, false, false, loadConfig.keepAliveSec),
-            MqttConnectPayload("group-${groupId}-channel-${channelId}", "", "", "iCureIoTUser","iCureIoTPassword")
+            MqttConnectPayload("group-${groupId}-channel-${channelId}", "", "", mqttCredentials.clientName,mqttCredentials.clientPassword)
         )
     }
 
