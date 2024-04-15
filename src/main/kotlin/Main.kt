@@ -36,7 +36,6 @@ fun main() {
         val clientPassword = System.getenv("MQTT_PASSWORD") ?: ""
         val mqttCredentials = MqttCredentials(clientName,clientPassword)
 
-        /*println("client $clientName $clientPassword")*/
 
 
 
@@ -70,7 +69,6 @@ fun main() {
 
                     val loadTest = LoadTester(
                         broker = broker_ip,
-
                         port = broker_port,
                         topic = topic,
                         mqttCredentials = mqttCredentials,
