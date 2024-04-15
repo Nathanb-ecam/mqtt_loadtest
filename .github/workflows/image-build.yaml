@@ -20,4 +20,4 @@ jobs:
         run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Push Docker image
-        run: docker push thenatz1999/loadtester_amd_x86
+        run: docker push thenatz1999/loadtester_x86
