@@ -67,7 +67,9 @@ fun main() {
                         amountOfGroups = amountOfGroups
                     )
 
-                    val loadTest = LoadTester(
+
+
+  =                  val loadTest = LoadTester(
                         broker = broker_ip,
                         port = broker_port,
                         topic = topic,

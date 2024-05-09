@@ -9,12 +9,12 @@ import org.example.MessageInfoMetrics
 import org.example.org.example.MqttCredentials
 
 class MqttClientHandler(
-    private val groupId : Int,
-    private val channelId : Int,
+    private val groupId: Int,
+    private val channelId: Int,
     private val topic: String,
     private val loadConfig: LoadConfig,
     private val mqttCredentials: MqttCredentials,
-    private val messageCounter : MessageInfoMetrics?
+    private val messageCounter: MessageInfoMetrics?
 ) : ChannelInboundHandlerAdapter() {
 
     private var connectMessage: MqttMessage? = null
@@ -25,7 +25,13 @@ class MqttClientHandler(
         connectMessage = MqttMessageFactory.newMessage(
             MqttFixedHeader(MqttMessageType.CONNECT, false, loadConfig.qos, false, 0),
             MqttConnectVariableHeader("MQTT", 4, true, true, false, 0, false, false, loadConfig.keepAliveSec),
-            MqttConnectPayload("group-${groupId}-channel-${channelId}", "", "", mqttCredentials.clientName,mqttCredentials.clientPassword)
+            MqttConnectPayload(
+                "group-${groupId}-channel-${channelId}",
+                "",
+                "",
+                mqttCredentials.clientName,
+                mqttCredentials.clientPassword
+            )
         )
     }
 
@@ -37,7 +43,7 @@ class MqttClientHandler(
         if (msg is MqttMessage) {
             if (msg.fixedHeader().messageType() == MqttMessageType.CONNACK) {
                 for (i in 1..loadConfig.nMessagesPerChannel) {
-                    val message  = MqttMessageFactory.newMessage(
+                    val message = MqttMessageFactory.newMessage(
                         MqttFixedHeader(MqttMessageType.PUBLISH, false, loadConfig.qos, false, 0),
                         MqttPublishVariableHeader(topic, 0),
                         /*Unpooled.buffer().writeBytes(messagePayload.toByteArray())*/
