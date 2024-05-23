@@ -13,6 +13,7 @@ import io.netty.handler.codec.mqtt.MqttQoS
 import org.example.org.example.MqttCredentials
 import org.slf4j.event.Level
 import java.util.*
+import com.fasterxml.jackson.databind.ObjectMapper
 
 
 fun main() {
@@ -48,28 +49,44 @@ fun main() {
                 call.respondText("Alert")
             }
             post("/launch") {
+                var collectTest = false
+
                 val parameters = call.receiveParameters()
                 var status = "none"
 
                 val receivedToken = parameters["token"]
-                val messagePayloadSize = parameters["messagePayloadSize"]?.toIntOrNull() ?: 500
+                val messagePayloadSize = parameters["messagePayloadSize"]?.toIntOrNull() ?: 0
+                val messagePayload = parameters["messagePayload"] ?: ""
+
                 val nMessagesPerChannel = parameters["nMessagesPerChannel"]?.toIntOrNull() ?: 1000
                 val channelsPerThread = parameters["channelsPerThread"]?.toIntOrNull() ?: 100
                 val amountOfGroups = parameters["amountOfGroups"]?.toIntOrNull() ?: 10
 
 
+
                 if(receivedToken == token){
-                    val loadConfig = LoadConfig(
-                        qos = MqttQoS.AT_MOST_ONCE,
-                        messagePayloadSize = messagePayloadSize,
-                        nMessagesPerChannel = nMessagesPerChannel,
-                        channelsPerThread = channelsPerThread,
-                        amountOfGroups = amountOfGroups
-                    )
+                    if(messagePayload.length != 0) collectTest = true
+                    if(messagePayload.length == 0 && messagePayloadSize == 0 ) call.respondText("wtf is that query")
+                    val loadConfig: LoadConfig?
+                    if(collectTest){
+                        loadConfig = LoadConfig(
+                            qos = MqttQoS.AT_MOST_ONCE,
+                            messagePayloadBytes = messagePayload.toByteArray(Charsets.UTF_8),
+                            nMessagesPerChannel = nMessagesPerChannel,
+                            channelsPerThread = channelsPerThread,
+                            amountOfGroups = amountOfGroups
+                        )
+                    }else{
+                        loadConfig = LoadConfig(
+                            qos = MqttQoS.AT_MOST_ONCE,
+                            messagePayloadSize = messagePayloadSize,
+                            nMessagesPerChannel = nMessagesPerChannel,
+                            channelsPerThread = channelsPerThread,
+                            amountOfGroups = amountOfGroups
+                        )
+                    }
 
-
-
-  =                  val loadTest = LoadTester(
+                    val loadTest = LoadTester(
                         broker = broker_ip,
                         port = broker_port,
                         topic = topic,
@@ -81,15 +98,21 @@ fun main() {
                     val info = MessageInfoMetrics(loadConfig)
                     val parametersInfo = info.loadParameters()
                     println(parametersInfo)
-                    status = "launched : $broker_ip:$broker_port, $topic , ${info.getTheoreticalMessageCount()} ${mqttCredentials.clientName}\n"
+                    status = "Launched ${info.getTheoreticalMessageCount()} messages on $broker_ip:$broker_port, topic : $topic ,  username: ${mqttCredentials.clientName}\n"
 
+                }else{
+                    call.respondText("invalid token")
                 }
 
-
-
                 call.respondText(status)
-
             }
+
+
+
+
+
+
+
         }
     }.start(wait = true)
 }

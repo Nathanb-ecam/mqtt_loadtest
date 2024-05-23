@@ -39,17 +39,25 @@ class MqttClientHandler(
         ctx.writeAndFlush(connectMessage)
     }
 
+
+
     override fun channelRead(ctx: ChannelHandlerContext, msg: Any) {
         if (msg is MqttMessage) {
             if (msg.fixedHeader().messageType() == MqttMessageType.CONNACK) {
+
                 for (i in 1..loadConfig.nMessagesPerChannel) {
                     val message = MqttMessageFactory.newMessage(
                         MqttFixedHeader(MqttMessageType.PUBLISH, false, loadConfig.qos, false, 0),
                         MqttPublishVariableHeader(topic, 0),
                         /*Unpooled.buffer().writeBytes(messagePayload.toByteArray())*/
-                        Unpooled.buffer().writeBytes(ByteArray(loadConfig.messagePayloadSize))
+                        if(loadConfig.messagePayloadBytes?.size!! >= 1){
+                            Unpooled.buffer().writeBytes(loadConfig.messagePayloadBytes)
+                        }else{
+                            Unpooled.buffer().writeBytes(ByteArray(loadConfig.messagePayloadSize!!))
+                        }
+
                     )
-                    /*println("PUB ${i}")*/
+
                     messageSentCount++
                     messageCounter?.increment()
                     ctx.writeAndFlush(message)
@@ -64,6 +72,8 @@ class MqttClientHandler(
             }*/
         }
     }
+
+
 
     override fun exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable) {
         cause.printStackTrace()

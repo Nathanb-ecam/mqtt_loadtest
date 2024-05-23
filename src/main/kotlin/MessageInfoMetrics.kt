@@ -33,6 +33,7 @@ class MessageInfoMetrics(
             appendLine("messages/channel : ${loadConfig.nMessagesPerChannel} ")
             appendLine("Keep alive : ${loadConfig.keepAliveSec}")
             appendLine("qos : ${loadConfig.qos}")
+            appendLine("messagePayload :${loadConfig.messagePayloadBytes}")
             appendLine("payload size : ${loadConfig.messagePayloadSize}")
             appendLine("theoretical value : ${theoreticalMessageCount}")
         }
