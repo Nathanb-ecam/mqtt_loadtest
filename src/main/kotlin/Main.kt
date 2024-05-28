@@ -62,6 +62,11 @@ fun main() {
                 val channelsPerGroup = parameters["channelsPerGroup"]?.toIntOrNull() ?: 100
                 val amountOfGroups = parameters["amountOfGroups"]?.toIntOrNull() ?: 10
 
+                val keepAliveSeconds = parameters["keepAliveSeconds"]?.toIntOrNull() ?: 15
+                val qos = parameters["qos"]?.toIntOrNull() ?: 0
+                val mqttQos = MqttQoS.valueOf(qos)
+
+
 
 
                 if(receivedToken == token){
@@ -70,7 +75,8 @@ fun main() {
                     val loadConfig: LoadConfig?
                     if(collectTest){
                         loadConfig = LoadConfig(
-                            qos = MqttQoS.AT_MOST_ONCE,
+                            keepAliveSec = keepAliveSeconds,
+                            qos = mqttQos,
                             messagePayloadBytes = messagePayload.toByteArray(Charsets.UTF_8),
                             nMessagesPerChannel = nMessagesPerChannel,
                             channelsPerGroup = channelsPerGroup,
@@ -78,7 +84,8 @@ fun main() {
                         )
                     }else{
                         loadConfig = LoadConfig(
-                            qos = MqttQoS.AT_MOST_ONCE,
+                            keepAliveSec = keepAliveSeconds,
+                            qos = mqttQos,
                             messagePayloadSize = messagePayloadSize,
                             nMessagesPerChannel = nMessagesPerChannel,
                             channelsPerGroup = channelsPerGroup,

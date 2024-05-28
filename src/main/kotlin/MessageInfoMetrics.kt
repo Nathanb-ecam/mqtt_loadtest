@@ -27,15 +27,15 @@ class MessageInfoMetrics(
 
         return buildString {
             appendLine("Load parameters :")
-            appendLine("group(s) : ${loadConfig.amountOfGroups} ")
-            appendLine("thread(s) : ${loadConfig.eventLoopsPerGroup} ")
-            appendLine("channel(s)/thread : ${loadConfig.channelsPerGroup}")
-            appendLine("messages/channel : ${loadConfig.nMessagesPerChannel} ")
-            appendLine("Keep alive : ${loadConfig.keepAliveSec}")
-            appendLine("qos : ${loadConfig.qos}")
-            appendLine("messagePayload :${loadConfig.messagePayloadBytes}")
-            appendLine("payload size : ${loadConfig.messagePayloadSize}")
-            appendLine("theoretical value : ${theoreticalMessageCount}")
+            appendLine("\t - group(s) : ${loadConfig.amountOfGroups} ")
+            appendLine("\t - thread(s) : ${loadConfig.eventLoopsPerGroup} ")
+            appendLine("\t - channel(s)/thread : ${loadConfig.channelsPerGroup}")
+            appendLine("\t - messages/channel : ${loadConfig.nMessagesPerChannel} ")
+            appendLine("\t - Keep alive : ${loadConfig.keepAliveSec}")
+            appendLine("\t - qos : ${loadConfig.qos}")
+            appendLine("\t - messagePayload :${loadConfig.messagePayloadBytes?.toString(Charsets.UTF_8)}")
+            appendLine("\t - payload size : ${loadConfig.messagePayloadSize}")
+            appendLine("\t - theoretical value : ${theoreticalMessageCount}")
         }
     }
 }

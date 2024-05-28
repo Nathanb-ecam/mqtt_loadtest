@@ -4,7 +4,7 @@ import io.netty.handler.codec.mqtt.MqttQoS
 
 data class LoadConfig(
     val qos : MqttQoS = MqttQoS.AT_MOST_ONCE,
-    val keepAliveSec : Int = 10,
+    val keepAliveSec : Int = 15,
     val messagePayloadSize: Int? = null,
     val nMessagesPerChannel: Int = 100,
     val channelsPerGroup : Int = 5,

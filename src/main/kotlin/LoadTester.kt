@@ -40,7 +40,7 @@ class LoadTester(
                 .toLocalDateTime()
 
             val formatter = DateTimeFormatter.ofPattern("HH:mm")
-            println("Latest launch time:${dateTime.format(formatter)}")
+            println("\n\n-------------------------------${dateTime.format(formatter)}-------------------------------")
 
             val eventLoopGroup = NioEventLoopGroup(Runtime.getRuntime().availableProcessors() * 2)
             repeat(loadConfig.amountOfGroups) {groupId->
@@ -60,20 +60,18 @@ class LoadTester(
 
 
                     } finally {
-                        val endTime = System.currentTimeMillis()
+                        val endTime = currentTimeMillis()
                         val duration = endTime - startTime
 
-                        println("Execution time: ${groupId} $duration ms")
+                        println("Execution time group-${groupId} : $duration ms")
                         infoMetrics?.let {
                             println("Sent : ${infoMetrics.getSentMessageAmount()}")
                         }
-
                         eventLoopGroup.shutdownGracefully()
                     }
-
                 }
-
             }
+
 
 
         }catch(e: Exception){
