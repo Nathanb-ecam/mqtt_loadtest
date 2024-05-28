@@ -8,7 +8,7 @@ class MessageInfoMetrics(
     private var theoreticalMessageCount = 0
 
     init {
-        theoreticalMessageCount = loadConfig.amountOfGroups * loadConfig.channelsPerThread * loadConfig.nMessagesPerChannel
+        theoreticalMessageCount = loadConfig.amountOfGroups * loadConfig.channelsPerGroup * loadConfig.nMessagesPerChannel
     }
     @Synchronized
     fun increment(){
@@ -29,7 +29,7 @@ class MessageInfoMetrics(
             appendLine("Load parameters :")
             appendLine("group(s) : ${loadConfig.amountOfGroups} ")
             appendLine("thread(s) : ${loadConfig.eventLoopsPerGroup} ")
-            appendLine("channel(s)/thread : ${loadConfig.channelsPerThread}")
+            appendLine("channel(s)/thread : ${loadConfig.channelsPerGroup}")
             appendLine("messages/channel : ${loadConfig.nMessagesPerChannel} ")
             appendLine("Keep alive : ${loadConfig.keepAliveSec}")
             appendLine("qos : ${loadConfig.qos}")

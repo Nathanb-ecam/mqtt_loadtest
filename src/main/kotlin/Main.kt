@@ -59,7 +59,7 @@ fun main() {
                 val messagePayload = parameters["messagePayload"] ?: ""
 
                 val nMessagesPerChannel = parameters["nMessagesPerChannel"]?.toIntOrNull() ?: 1000
-                val channelsPerThread = parameters["channelsPerThread"]?.toIntOrNull() ?: 100
+                val channelsPerGroup = parameters["channelsPerGroup"]?.toIntOrNull() ?: 100
                 val amountOfGroups = parameters["amountOfGroups"]?.toIntOrNull() ?: 10
 
 
@@ -73,7 +73,7 @@ fun main() {
                             qos = MqttQoS.AT_MOST_ONCE,
                             messagePayloadBytes = messagePayload.toByteArray(Charsets.UTF_8),
                             nMessagesPerChannel = nMessagesPerChannel,
-                            channelsPerThread = channelsPerThread,
+                            channelsPerGroup = channelsPerGroup,
                             amountOfGroups = amountOfGroups
                         )
                     }else{
@@ -81,7 +81,7 @@ fun main() {
                             qos = MqttQoS.AT_MOST_ONCE,
                             messagePayloadSize = messagePayloadSize,
                             nMessagesPerChannel = nMessagesPerChannel,
-                            channelsPerThread = channelsPerThread,
+                            channelsPerGroup = channelsPerGroup,
                             amountOfGroups = amountOfGroups
                         )
                     }

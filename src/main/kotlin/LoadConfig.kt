@@ -7,7 +7,7 @@ data class LoadConfig(
     val keepAliveSec : Int = 10,
     val messagePayloadSize: Int? = null,
     val nMessagesPerChannel: Int = 100,
-    val channelsPerThread : Int = 5,
+    val channelsPerGroup : Int = 5,
     val eventLoopsPerGroup : Int = 10,
     val amountOfGroups : Int = 1,
     val messagePayloadBytes : ByteArray? = ByteArray(0),
