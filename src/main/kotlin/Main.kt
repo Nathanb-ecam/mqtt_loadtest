@@ -14,6 +14,7 @@ import org.example.org.example.MqttCredentials
 import org.slf4j.event.Level
 import java.util.*
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.example.mqtt.MqttPayload
 
 
 fun main() {
@@ -40,6 +41,7 @@ fun main() {
 
 
 
+
         routing {
             get("/") {
                 call.respondText("Hello, Ktor!")
@@ -56,7 +58,7 @@ fun main() {
 
                 val receivedToken = parameters["token"]
                 val messagePayloadSize = parameters["messagePayloadSize"]?.toIntOrNull() ?: 0
-                val messagePayload = parameters["messagePayload"] ?: ""
+                val messagePayloadString = parameters["messagePayloadString"] ?: ""
 
                 val nMessagesPerChannel = parameters["nMessagesPerChannel"]?.toIntOrNull() ?: 1000
                 val channelsPerGroup = parameters["channelsPerGroup"]?.toIntOrNull() ?: 100
@@ -66,46 +68,60 @@ fun main() {
                 val qos = parameters["qos"]?.toIntOrNull() ?: 0
                 val mqttQos = MqttQoS.valueOf(qos)
 
+                val cid = parameters["mqttCid"] ?: ""
+                val mqttToken = parameters["mqttToken"] ?: ""
+
+
+                val mqttPayload = MqttPayload(
+                    cid = cid,
+                    token = mqttToken
+                )
 
 
 
                 if(receivedToken == token){
-                    if(messagePayload.length != 0) collectTest = true
-                    if(messagePayload.length == 0 && messagePayloadSize == 0 ) call.respondText("wtf is that query")
-                    val loadConfig: LoadConfig?
-                    if(collectTest){
-                        loadConfig = LoadConfig(
-                            keepAliveSec = keepAliveSeconds,
-                            qos = mqttQos,
-                            messagePayloadBytes = messagePayload.toByteArray(Charsets.UTF_8),
-                            nMessagesPerChannel = nMessagesPerChannel,
-                            channelsPerGroup = channelsPerGroup,
-                            amountOfGroups = amountOfGroups
+                    if(messagePayloadString.isNotEmpty()) collectTest = true
+                    if(messagePayloadString.isEmpty() && messagePayloadSize == 0 ) {call.respondText("Need to provide payloadString or the amount of bytes for the payload ")}
+                    else{
+                        val loadConfig: LoadConfig?
+                        if(collectTest){
+                            loadConfig = LoadConfig(
+                                payload = mqttPayload,
+                                keepAliveSec = keepAliveSeconds,
+                                qos = mqttQos,
+//                            messagePayload = encryptedSelf.toByteArray(Charsets.UTF_8),
+                                messagePayloadString = messagePayloadString,
+
+                                nMessagesPerChannel = nMessagesPerChannel,
+                                channelsPerGroup = channelsPerGroup,
+                                amountOfGroups = amountOfGroups
+                            )
+                        }else{
+                            loadConfig = LoadConfig(
+                                keepAliveSec = keepAliveSeconds,
+                                qos = mqttQos,
+                                messagePayloadSize = messagePayloadSize,
+                                nMessagesPerChannel = nMessagesPerChannel,
+                                channelsPerGroup = channelsPerGroup,
+                                amountOfGroups = amountOfGroups
+                            )
+                        }
+
+                        val loadTest = LoadTester(
+                            broker = broker_ip,
+                            port = broker_port,
+                            topic = topic,
+                            mqttCredentials = mqttCredentials,
+                            loadConfig
                         )
-                    }else{
-                        loadConfig = LoadConfig(
-                            keepAliveSec = keepAliveSeconds,
-                            qos = mqttQos,
-                            messagePayloadSize = messagePayloadSize,
-                            nMessagesPerChannel = nMessagesPerChannel,
-                            channelsPerGroup = channelsPerGroup,
-                            amountOfGroups = amountOfGroups
-                        )
+                        loadTest.launch()
+
+                        val info = MessageInfoMetrics(loadConfig)
+                        val parametersInfo = info.loadParameters()
+                        println(parametersInfo)
+                        status = "Launched ${info.getTheoreticalMessageCount()} messages on $broker_ip:$broker_port, topic : $topic ,  username: ${mqttCredentials.clientName}\n"
                     }
 
-                    val loadTest = LoadTester(
-                        broker = broker_ip,
-                        port = broker_port,
-                        topic = topic,
-                        mqttCredentials = mqttCredentials,
-                        loadConfig
-                    )
-                    loadTest.launch()
-
-                    val info = MessageInfoMetrics(loadConfig)
-                    val parametersInfo = info.loadParameters()
-                    println(parametersInfo)
-                    status = "Launched ${info.getTheoreticalMessageCount()} messages on $broker_ip:$broker_port, topic : $topic ,  username: ${mqttCredentials.clientName}\n"
 
                 }else{
                     call.respondText("invalid token")

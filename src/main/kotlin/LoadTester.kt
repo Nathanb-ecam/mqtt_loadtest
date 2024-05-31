@@ -1,6 +1,8 @@
 package org.example
 
 import io.netty.bootstrap.Bootstrap
+import io.netty.channel.ChannelFuture
+import io.netty.channel.ChannelOption
 import io.netty.channel.nio.NioEventLoopGroup
 import io.netty.channel.socket.nio.NioSocketChannel
 import org.example.mqtt.MqttClientInitializer
@@ -47,12 +49,13 @@ class LoadTester(
                 executor.submit {
 
                     try {
+
                         val bootstrap = Bootstrap()
                         bootstrap.group(eventLoopGroup)
                             .channel(NioSocketChannel::class.java)
                             .handler(MqttClientInitializer(groupId,topic, loadConfig,mqttCredentials,infoMetrics))
                         for(i in 1..loadConfig.channelsPerGroup){
-                            /*println("channel ${i}")*/
+                            //println("channel ${i}")
                             val future = bootstrap.connect(InetSocketAddress(broker, port)).sync()
                             future.channel().closeFuture().sync()
                         }
@@ -71,8 +74,6 @@ class LoadTester(
                     }
                 }
             }
-
-
 
         }catch(e: Exception){
             e.printStackTrace()

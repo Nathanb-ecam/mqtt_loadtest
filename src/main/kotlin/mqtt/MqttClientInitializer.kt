@@ -11,6 +11,7 @@ import org.example.org.example.MqttCredentials
 
 class MqttClientInitializer(
     private val groupId : Int,
+    //private val channelId : Int,
     private val topic: String,
     private val loadConfig: LoadConfig,
     private val mqttCredentials: MqttCredentials,

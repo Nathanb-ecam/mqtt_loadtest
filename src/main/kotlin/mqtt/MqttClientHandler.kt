@@ -1,5 +1,6 @@
 package org.example.mqtt
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.netty.buffer.Unpooled
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInboundHandlerAdapter
@@ -17,8 +18,27 @@ class MqttClientHandler(
     private val messageCounter: MessageInfoMetrics?
 ) : ChannelInboundHandlerAdapter() {
 
+    //'{"cid":"daz","uid":"daz","token":"data":loadConfig.encryptedSelf}'
+
+
+    private val payload = mapOf(
+        "cid" to loadConfig.payload?.cid,
+        "uid" to "g${groupId}-c${channelId}@loadtest.com",
+        "token" to loadConfig.payload?.token,
+        "data" to loadConfig.messagePayloadString
+    )
+
+    private val objectMapper = ObjectMapper()
     private var connectMessage: MqttMessage? = null
     private var messageSentCount = 0
+
+    private val payloadBytes = if (loadConfig.messagePayloadString.isNotEmpty()) {
+        objectMapper.writeValueAsBytes(payload)
+
+    } else {
+        ByteArray(loadConfig.messagePayloadSize!!)
+    }
+
     /*private var pubAckCount = 0*/
 
     init {
@@ -44,14 +64,16 @@ class MqttClientHandler(
     override fun channelRead(ctx: ChannelHandlerContext, msg: Any) {
         if (msg is MqttMessage) {
             if (msg.fixedHeader().messageType() == MqttMessageType.CONNACK) {
-
+                //println("current user : ${payload["uid"]}")
                 for (i in 1..loadConfig.nMessagesPerChannel) {
+
+
                     val message = MqttMessageFactory.newMessage(
                         MqttFixedHeader(MqttMessageType.PUBLISH, false, loadConfig.qos, false, 0),
                         MqttPublishVariableHeader(topic, 0),
                         /*Unpooled.buffer().writeBytes(messagePayload.toByteArray())*/
-                        if(loadConfig.messagePayloadBytes?.size!! >= 1){
-                            Unpooled.buffer().writeBytes(loadConfig.messagePayloadBytes)
+                        if(loadConfig.messagePayloadString.isNotEmpty()){
+                            Unpooled.buffer().writeBytes(payloadBytes)
                         }else{
                             Unpooled.buffer().writeBytes(ByteArray(loadConfig.messagePayloadSize!!))
                         }
@@ -63,13 +85,7 @@ class MqttClientHandler(
                     ctx.writeAndFlush(message)
                 }
                 ctx.close()
-            } /*else if (msg.fixedHeader().messageType() == MqttMessageType.PUBACK) {
-                pubAckCount++
-                if (pubAckCount == messageCount) {
-                    println("All messages published successfully")
-                    ctx.close()
-                }
-            }*/
+            }
         }
     }
 

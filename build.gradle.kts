@@ -20,6 +20,7 @@ dependencies {
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm")
     implementation("io.ktor:ktor-server-content-negotiation-jvm")
 
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.12.3")
     implementation("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5")
     testImplementation("org.jetbrains.kotlin:kotlin-test")
 }
