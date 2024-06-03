@@ -68,7 +68,7 @@ class LoadTester(
 
                         println("Execution time group-${groupId} : $duration ms")
                         infoMetrics?.let {
-                            println("Sent : ${infoMetrics.getSentMessageAmount()}")
+                            println("Sent: ${infoMetrics.getSentMessageAmount()}")
                         }
                         eventLoopGroup.shutdownGracefully()
                     }
