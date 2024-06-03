@@ -14,10 +14,10 @@ jobs:
         uses: actions/checkout@v1
 
       - name: Build Docker loadtest image
-        run: docker build --platform linux/amd64 -f Dockerfile -t thenatz1999/loadtester .
+        run: docker build --platform linux/amd64 -f Dockerfile -t thenatz1999/loadtester:last .
 
       - name: Log in to Docker Hub
         run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Push Docker image
-        run: docker push thenatz1999/loadtester
+        run: docker push thenatz1999/loadtester:last
