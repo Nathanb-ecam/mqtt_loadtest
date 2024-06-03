@@ -66,8 +66,6 @@ class MqttClientHandler(
             if (msg.fixedHeader().messageType() == MqttMessageType.CONNACK) {
                 //println("current user : ${payload["uid"]}")
                 for (i in 1..loadConfig.nMessagesPerChannel) {
-
-
                     val message = MqttMessageFactory.newMessage(
                         MqttFixedHeader(MqttMessageType.PUBLISH, false, loadConfig.qos, false, 0),
                         MqttPublishVariableHeader(topic, 0),
@@ -79,7 +77,6 @@ class MqttClientHandler(
                         }
 
                     )
-
                     messageSentCount++
                     messageCounter?.increment()
                     ctx.writeAndFlush(message)
