@@ -39,6 +39,18 @@ class MqttClientHandler(
         ByteArray(loadConfig.messagePayloadSize!!)
     }
 
+    private val message = MqttMessageFactory.newMessage(
+        MqttFixedHeader(MqttMessageType.PUBLISH, false, loadConfig.qos, false, 0),
+        MqttPublishVariableHeader(topic, 0),
+        /*Unpooled.buffer().writeBytes(messagePayload.toByteArray())*/
+        if(loadConfig.messagePayloadString.isNotEmpty()){
+            Unpooled.buffer().writeBytes(payloadBytes)
+        }else{
+            Unpooled.buffer().writeBytes(ByteArray(loadConfig.messagePayloadSize!!))
+        }
+
+    )
+
     /*private var pubAckCount = 0*/
 
     init {
@@ -68,17 +80,7 @@ class MqttClientHandler(
                 for (i in 1..loadConfig.nMessagesPerChannel) {
 
 
-                    val message = MqttMessageFactory.newMessage(
-                        MqttFixedHeader(MqttMessageType.PUBLISH, false, loadConfig.qos, false, 0),
-                        MqttPublishVariableHeader(topic, 0),
-                        /*Unpooled.buffer().writeBytes(messagePayload.toByteArray())*/
-                        if(loadConfig.messagePayloadString.isNotEmpty()){
-                            Unpooled.buffer().writeBytes(payloadBytes)
-                        }else{
-                            Unpooled.buffer().writeBytes(ByteArray(loadConfig.messagePayloadSize!!))
-                        }
 
-                    )
 
                     messageSentCount++
                     messageCounter?.increment()

@@ -16,6 +16,8 @@ dependencies {
     implementation("io.ktor:ktor-server-call-logging-jvm")
     implementation("io.ktor:ktor-server-cors-jvm")
     implementation("io.netty:netty-all:4.1.65.Final")
+
+
     implementation("com.fasterxml.jackson.core:jackson-databind:2.12.3")
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm")
     implementation("io.ktor:ktor-server-content-negotiation-jvm")
